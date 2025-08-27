@@ -73,19 +73,28 @@ public:
     }
 
     string getFullData() {
-        return pass_number + "\n" + last_name + "\n" + first_name + "\n" + nationality + "\n" + dob + "\n" +
-               cnic_no + "\n" + gender + "\n" + father_last_name + " " + father_first_name + "\n" + doi + "\n" +
+        return pass_number + "\n" + first_name + "\n" + last_name + "\n" + nationality + "\n" + dob + "\n" +
+               cnic_no + "\n" + gender + "\n" + father_first_name + " " + father_last_name + "\n" + doi + "\n" +
                poi + "\n" + doe + "\n---";
     }
 
     void saveToFile() {
         ofstream outFile("passport_data.txt", ios::app);
+        if (!outFile) {
+            cout << "Error: Could not open file for writing.\n";
+            return;
+        }
         outFile << getFullData() << endl;
         outFile.close();
     }
 
     static void loadAllFromFile() {
         ifstream inFile("passport_data.txt");
+        if (!inFile) {
+            cout << "Error: No records found.\n";
+            return;
+        }
+
         string line;
         while (getline(inFile, line)) {
             cout << line << endl;
@@ -95,15 +104,20 @@ public:
 
     static void findByPassportNumber(string pnum) {
         ifstream inFile("passport_data.txt");
+        if (!inFile) {
+            cout << "Error: No records found.\n";
+            return;
+        }
+
         string line;
         bool found = false;
 
         while (getline(inFile, line)) {
-            string pass, ln, fn, nat, dob, cnic, gen, fname, doi, poi, doe, dash;
+            string pass, fn, ln, nat, dob, cnic, gen, fname, doi, poi, doe, dash;
 
             pass = line;
-            getline(inFile, ln);
             getline(inFile, fn);
+            getline(inFile, ln);
             getline(inFile, nat);
             getline(inFile, dob);
             getline(inFile, cnic);
@@ -129,7 +143,8 @@ public:
                 cout << "Expiry Date: " << doe << endl;
                 break;
             } else {
-                for (int i = 0; i < 10; i++) getline(inFile, line);
+                // Skip rest of this record (11 lines: 10 fields + "---")
+                for (int i = 0; i < 11; i++) getline(inFile, line);
             }
         }
 
@@ -142,55 +157,54 @@ public:
 };
 
 void addPassport() {
-    Passport* p = new Passport;
+    Passport p;
     string pass_no, fname, lname, nat, dob, cnic, gender, ffname, flname, doi, poi, doe;
 
     cout << "Passport Number: ";
     getline(cin, pass_no);
-    p->setPassportNumber(pass_no);
+    p.setPassportNumber(pass_no);
 
     cout << "First Name: ";
     getline(cin, fname);
     cout << "Last Name: ";
     getline(cin, lname);
-    p->setName(fname, lname);
+    p.setName(fname, lname);
 
     cout << "Nationality: ";
     getline(cin, nat);
-    p->setNationality(nat);
+    p.setNationality(nat);
 
     cout << "Date of Birth: ";
     getline(cin, dob);
-    p->setDOB(dob);
+    p.setDOB(dob);
 
     cout << "CNIC Number: ";
     getline(cin, cnic);
-    p->setCNIC(cnic);
+    p.setCNIC(cnic);
 
     cout << "Gender: ";
     getline(cin, gender);
-    p->setGender(gender);
+    p.setGender(gender);
 
     cout << "Father First Name: ";
     getline(cin, ffname);
     cout << "Father Last Name: ";
     getline(cin, flname);
-    p->setFatherName(ffname, flname);
+    p.setFatherName(ffname, flname);
 
     cout << "Place of Issue: ";
     getline(cin, poi);
-    p->setPlaceofIssue(poi);
+    p.setPlaceofIssue(poi);
 
     cout << "Date of Issue: ";
     getline(cin, doi);
-    p->setDateofIssue(doi);
+    p.setDateofIssue(doi);
 
     cout << "Expiry Date: ";
     getline(cin, doe);
-    p->setDOE(doe);
+    p.setDOE(doe);
 
-    p->saveToFile();
-    delete p;
+    p.saveToFile();
 }
 
 int main() {
